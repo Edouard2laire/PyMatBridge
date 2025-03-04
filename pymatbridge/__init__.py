@@ -1,0 +1,1 @@
+from .pymatbridge import PyMatBridge  # Explicitly expose the class
