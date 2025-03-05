@@ -33,7 +33,15 @@ class PyMatBridge:
         
         self.loaded_python_module[alias] = module
         return True
-    
+    def link_python_function(self, alias:str, func):
+        if alias in self.loaded_python_module : 
+            print(f' Function {alias} is already loaded')
+            return True
+        
+        self.loaded_python_module[alias] = func
+
+
+
     def get_loaded_python_module(self): 
         return list(self.loaded_python_module.keys())
 
@@ -90,11 +98,16 @@ class PyMatBridge:
                 raise AttributeError(f"Function '{func_name}' not found in module '{module_name}'.")
                  
         else:
-            # Check in built-in functions 
-            func = getattr(builtins, func_name, None)
-            if func is None:
-                raise NameError(f"Function '{func_name}' not found in built-ins.")
+            # Check in registered functions 
+            func = self.get_python_module(func_name)
 
+            if func is None:
+                # Check in builtins functions 
+                func = getattr(builtins, func_name, None)
+            
+            if func is None:
+                raise AttributeError(f"Function '{func_name}' not found")
+            
         return func(*args, **kwargs)
 
     def stop_matlab(self):
