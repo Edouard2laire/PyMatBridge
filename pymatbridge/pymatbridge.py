@@ -1,3 +1,4 @@
+import builtins
 import importlib
 from types import ModuleType
 import matlab.engine
@@ -89,7 +90,10 @@ class PyMatBridge:
                 raise AttributeError(f"Function '{func_name}' not found in module '{module_name}'.")
                  
         else:
-            func = eval(func_name)  # For built-in or global functions
+            # Check in built-in functions 
+            func = getattr(builtins, func_name, None)
+            if func is None:
+                raise NameError(f"Function '{func_name}' not found in built-ins.")
 
         return func(*args, **kwargs)
 
