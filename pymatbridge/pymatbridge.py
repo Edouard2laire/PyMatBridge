@@ -36,6 +36,21 @@ class PyMatBridge:
     def get_loaded_python_module(self): 
         return list(self.loaded_python_module.keys())
 
+    def get_python_module(self,  module_name:str) -> ModuleType | None:
+        ''' Return the module module_name '''
+
+        if module_name in self.loaded_python_module:
+            return self.loaded_python_module[module_name]
+
+        if "." not in module_name:
+            return None
+        
+        parent_module, sub_module = module_name.rsplit(".", 1)
+
+        # We check if the parent module is loaded
+        module = self.get_python_module(parent_module)
+        return getattr(module, sub_module)
+
     def call(self, func_name, *args, **kwargs):
 
         """ Try calling a Python function first, then fall back to MATLAB. """
@@ -60,20 +75,23 @@ class PyMatBridge:
 
     def call_python(self, func_name, *args, **kwargs):
             
-             # Handle module-scoped functions like math.sin or np.linspace
-            if "." in func_name:
-                module_name, func_name = func_name.rsplit(".", 1)
+        # Handle module-scoped functions like math.sin or np.linspace
+        if "." in func_name:
+                
+            module_name, func_name = func_name.rsplit(".", 1)
+            module = self.get_python_module(module_name)
 
-                if module_name in self.loaded_python_module:
-                    func = getattr(self.loaded_python_module[module_name], func_name)
-                    if func is None:
-                        raise AttributeError(f"Function '{func_name}' not found in module '{module_name}'.")
-                else: 
-                    raise ModuleNotFoundError(f"Mdule '{module_name}' not found.")
-            else:
-                func = eval(func_name)  # For built-in or global functions
+            if module is None:
+                raise ModuleNotFoundError(f"Mdule '{module_name}' not found.")
 
-            return func(*args, **kwargs)
+            func = getattr(module, func_name)
+            if func is None:
+                raise AttributeError(f"Function '{func_name}' not found in module '{module_name}'.")
+                 
+        else:
+            func = eval(func_name)  # For built-in or global functions
+
+        return func(*args, **kwargs)
 
     def stop_matlab(self):
         self.eng.quit()
