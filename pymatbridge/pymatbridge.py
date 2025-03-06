@@ -1,6 +1,6 @@
 import builtins
 import importlib
-from types import ModuleType
+from types import ModuleType, FunctionType
 import matlab.engine
 
 class PyMatBridge:
@@ -45,7 +45,7 @@ class PyMatBridge:
     def get_loaded_python_module(self): 
         return list(self.loaded_python_module.keys())
 
-    def get_python_module(self,  module_name:str) -> ModuleType | None:
+    def get_python_module(self,  module_name:str) -> ModuleType | FunctionType | None:
         ''' Return the module module_name '''
 
         if module_name in self.loaded_python_module:
@@ -65,7 +65,7 @@ class PyMatBridge:
         """ Try calling a Python function first, then fall back to MATLAB. """
         try:
             return self.call_python(func_name, *args, **kwargs)
-        except (AttributeError,ModuleNotFoundError) as e:
+        except NameError as e:
             print(str(e))
             pass
 
@@ -82,33 +82,20 @@ class PyMatBridge:
             raise ValueError(f"Function '{func_name}' not found in Python or MATLAB.")
 
 
-    def call_python(self, func_name, *args, **kwargs):
-            
-        # Handle module-scoped functions like math.sin or np.linspace
-        if "." in func_name:
-                
-            module_name, func_name = func_name.rsplit(".", 1)
-            module = self.get_python_module(module_name)
+    def call_python(self, func_name:str, *args, **kwargs) -> any:
+        
+        # Check in the loaded functions 
+        func = self.get_python_module(func_name)
+        if callable(func):
+            return func(*args, **kwargs)
 
-            if module is None:
-                raise ModuleNotFoundError(f"Mdule '{module_name}' not found.")
-
-            func = getattr(module, func_name)
-            if func is None:
-                raise AttributeError(f"Function '{func_name}' not found in module '{module_name}'.")
-                 
-        else:
-            # Check in registered functions 
-            func = self.get_python_module(func_name)
-
-            if func is None:
-                # Check in builtins functions 
-                func = getattr(builtins, func_name, None)
+        # Check in builtins functions 
+        func = getattr(builtins, func_name, None)
+        if callable(func) :
+            return func(*args, **kwargs)
+        
+        raise NameError(f"Function '{func_name}' not found")
             
-            if func is None:
-                raise AttributeError(f"Function '{func_name}' not found")
-            
-        return func(*args, **kwargs)
 
     def stop_matlab(self):
-        self.eng.quit()
+        self.eng.exit()

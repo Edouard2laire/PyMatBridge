@@ -2,15 +2,17 @@ from pymatbridge import PyMatBridge
 
 
 bridge = PyMatBridge()
-bridge.load_python_module('numpy', 'np')
 bridge.load_python_module('math')
 
 def square(x):
     return x*x
 
-bridge.link_python_function('square', square)
+def sum_of_square(n):
+    return sum( square(x) for x in range(1,n) )
 
 
-print( f" sin(3.14) = {0:.2f} ".format( bridge.call("math.sin", 3.14)))
-print(bridge.call("np.char.array", ['hello', 'world', 'numpy','array'])) 
-print(bridge.call("square",2 )) 
+print( f"Sin(3.14) = {0:.2f} ".format( bridge.call("math.sin", 3.14)))
+
+bridge.link_python_function('sum_of_square', sum_of_square)
+print("Sum of square: ", bridge.call("sum_of_square", 10 )) 
+
