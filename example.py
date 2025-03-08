@@ -1,4 +1,4 @@
-from pymatbridge import PyMatBridge
+from pymatbridge import PyMatBridge, GenericBackendInterface
 
 bridge = PyMatBridge(backend=["python", "matlab"])
 bridge.load_python_module('math')
@@ -13,3 +13,6 @@ print("Sum of square \t= ", bridge.call("sum_of_square", 20 ))
 
 
 print("randn(3) \t= " , bridge.call("randn", 3) ) 
+
+
+test = GenericBackendInterface()
