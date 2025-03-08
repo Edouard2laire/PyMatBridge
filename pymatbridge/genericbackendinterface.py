@@ -1,17 +1,19 @@
 
 class GenericBackendInterface:
 
+    name:str = ''
+    
     def __init__(self):
         pass
     
     def is_running(self) -> bool:
-        pass
+        raise NotImplementedError()
 
     def start(self): 
-        pass
+        raise NotImplementedError()
 
     def call(self, func_name:str, *args, **kwargs) -> any:
-        pass
+        raise NotImplementedError()
 
     def stop(self): 
-        pass
+        raise NotImplementedError()

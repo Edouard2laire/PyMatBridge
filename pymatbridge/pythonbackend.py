@@ -1,4 +1,4 @@
-from pymatbridge import GenericBackendInterface
+from .genericbackendinterface import GenericBackendInterface  # Explicitly expose the class
 
 from types import ModuleType, FunctionType
 from typing import Literal, Optional
@@ -13,6 +13,7 @@ class PythonBackend(GenericBackendInterface):
     loaded_python_module: dict[str, ModuleType] 
 
     def __init__(self):
+        self.name = 'python'
         self.loaded_python_module = {} 
 
     def is_running(self) -> bool:
@@ -39,35 +40,31 @@ class PythonBackend(GenericBackendInterface):
         pass
 
     # All functions related to Python 
-    def load_python_module(self, module_name:str, alias:str|None = None) -> bool: 
+    def load_python_module(self, module_name:str, alias:str|None = None) -> GenericBackendInterface: 
         alias = module_name if alias is None else alias
 
         if alias in self.loaded_python_module : 
             print(f' Module {alias} is already loaded')
-            return True
 
         # Import module dynamically
         try:
             module = importlib.import_module(module_name)  
         except ( ModuleNotFoundError):
             print(f"Unable to load {module_name} as {alias}. Module not found")
-            return False
         
         self.loaded_python_module[alias] = module
-        return True
+        return self
 
-    def link_python_function(self, alias:str, func:FunctionType) -> bool:
+    def link_python_function(self, alias:str, func:FunctionType) -> GenericBackendInterface:
         if not callable(func):
             print(f'{alias} is not callable')
-            return False
+
         if alias in self.loaded_python_module : 
             print(f' Function {alias} is already loaded')
-            return True
         
         self.loaded_python_module[alias] = func
-        return True
+        return self
     
-
     def get_loaded_python_module(self)  -> list: 
         return list(self.loaded_python_module.keys())
 
