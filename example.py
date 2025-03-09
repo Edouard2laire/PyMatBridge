@@ -1,4 +1,4 @@
-from pymatbridge import PyMatBridge, PythonBackend, MatlabBackend
+from pymatbridge import PyMatBridge, PythonBackend, MatlabBackend, CBackend
 import logging
 import numpy as np
 
@@ -44,3 +44,12 @@ A = bridge.call('randn', 10, 10)
 
 print('MATLAB: \n', np.matrix(Sa).transpose())
 print('Python: \n', np.matrix(Sb))
+
+
+# C: Calling C function
+
+bridge = PyMatBridge()
+bridge.add_backend(CBackend("libmathfuncs.so"))
+
+print("Square of 5.5:", bridge.call("square", 5.5))
+
