@@ -2,7 +2,7 @@ from .genericbackendinterface import GenericBackendInterface  # Explicitly expos
 
 import logging
 import matlab.engine
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 logger = logging.getLogger("MatlabBackend")
 logger.addHandler(logging.NullHandler())  # Prevents logging if the user doesn't configure it
@@ -12,16 +12,39 @@ class MatlabBackend(GenericBackendInterface):
 
     eng: matlab.engine.MatlabEngine | None
     nargout: int = 1
+    path: list[ tuple[str, int]] | None = None
 
     def __init__(self):
         self.name = 'matlab'
         self.eng = None
+        self.path = []
 
     def is_running(self) -> bool:
         if self.eng is None:
             return False
         
         return self.eng._check_matlab()
+
+    def addpath(self, folder:str, add_subfolder: Optional[bool] = False) -> GenericBackendInterface : 
+
+        self.path.append( (folder,add_subfolder ) )
+
+        if self.is_running():
+            self.__run_addpath( [self.path[-1]])
+
+        return self
+    
+    def __run_addpath(self, new_paths: list[ tuple[str, int]]): 
+        ''' Run the addpath function from matlab
+            Assume that matlab is started
+        '''
+
+        for (folder, add_subfolder) in new_paths: 
+
+            if add_subfolder:
+                folder = self.eng.genpath(folder , nargout = 1)
+
+            self.eng.addpath(folder , nargout = 0)
 
     def start(self) -> bool: 
 
@@ -34,6 +57,7 @@ class MatlabBackend(GenericBackendInterface):
             self.eng = None
             return False
         
+        self.__run_addpath(self.path)
         return True
     
     def get_function(self, func_name:str) -> Callable[..., Any] | None:  
