@@ -29,6 +29,9 @@ class PyMatBridge:
 
         if self.backend is None or len(self.backend) == 0 :
               raise RuntimeError(f"No backend available.")
+        
+        # Extract and rename __nargout for MATLAB, ignore for Python
+        nargout = kwargs.pop("__nargout", None)
 
         for iBackend, backend in enumerate(self.backend, start = 1):
             logger.info(f"Backend {iBackend} : calling {backend.name}")
@@ -36,12 +39,15 @@ class PyMatBridge:
             try:
                 if not backend.is_running():
                     logger.info(f"Backend {iBackend} is not running. Starting {backend.name}... ")
-                    backend.start()
 
+                    if not backend.start(): 
+                        logger.error(f"Unable to start {backend.name}... ")
+                        continue
+
+                backend.set_nargout(nargout)
                 return backend.call(func_name, *args, **kwargs)
             
             except (NameError,ValueError) as e:
                 logger.warning(f"Unable to call '{func_name}' using {backend.name}")
-                pass
 
         raise RuntimeError(f"Function '{func_name}' not found.")
