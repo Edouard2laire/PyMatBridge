@@ -43,8 +43,7 @@ class PythonBackend(GenericBackendInterface):
     def stop(self): 
         pass
 
-    # All functions related to Python 
-    def load_python_module(self, module_name:str, alias:str|None = None) -> GenericBackendInterface: 
+    def load_module(self, module_name:str, alias:str|None = None) -> GenericBackendInterface: 
         alias = module_name if alias is None else alias
 
         if alias in self.loaded_python_module : 
@@ -58,8 +57,47 @@ class PythonBackend(GenericBackendInterface):
         
         self.loaded_python_module[alias] = module
         return self
+    
+    def load_function_from_module(self, module_name:str, functions: str | list[str] )  -> GenericBackendInterface:
 
-    def link_python_function(self, alias:str, func:FunctionType) -> GenericBackendInterface:
+        ''' Load one, or multiple function from a module
+            Similar to 'import function from module'
+
+            Example: 
+                - import sin from math: bridge.load_function_from_module('math', 'sin')
+                - import sin, cos from math: bridge.load_function_from_module('math', ('sin', 'cos') )
+            
+            Note: 
+                - import * from math is not supported
+        '''
+
+        # Import module dynamically
+        try:
+            module = importlib.import_module(module_name)  
+        except ( ModuleNotFoundError):
+            logger.error(f"Unable to load {module}. Module not found")
+        
+        if isinstance(functions, str):
+            functions = [functions]
+        
+        for function_name in functions: 
+            logger.info(f' Loading  {function_name} from {module_name}')
+
+            function = getattr(module, function_name, None)
+
+            if function is None: 
+                logger.error(f"Unable to load {function_name} from {module_name}")
+                continue
+
+            self.loaded_python_module[function_name] = function
+
+        return self
+
+    def load_function(self,func:FunctionType,  alias:Optional[str] = None ) -> GenericBackendInterface:
+
+        if alias is None: 
+            alias = func.__name__
+
         if not callable(func):
             logger.error(f'{alias} is not callable')
 

@@ -14,13 +14,15 @@ logging.basicConfig(
 
 bridge = PyMatBridge()
 bridge.add_backend(PythonBackend()) \
-    .load_python_module('math')\
-    .load_python_module('numpy', 'np')\
-    .link_python_function('sum_of_square', sum_of_square)
+    .load_module('math')\
+    .load_function_from_module('math','cos')\
+    .load_module('numpy', 'np')\
+    .load_function(sum_of_square)
 
 # ✅ Works in Python
 
 print("Sin(3.14) \t= " , bridge.call("math.sin", 3.14 )) 
+print("Cos(3.14) \t= " , bridge.call("cos", 3.14 )) 
 print("Sum of square \t= ", bridge.call("sum_of_square", 20 )) 
 
 # ✅ Works in Matlab
