@@ -1,5 +1,10 @@
 from .genericbackendinterface import GenericBackendInterface  # Explicitly expose the class
+
+import logging
 import matlab.engine
+
+logger = logging.getLogger("MatlabBackend")
+logger.addHandler(logging.NullHandler())  # Prevents logging if the user doesn't configure it
 
 
 class MatlabBackend(GenericBackendInterface):
@@ -17,7 +22,7 @@ class MatlabBackend(GenericBackendInterface):
         return self.eng._check_matlab()
 
     def start(self): 
-        print('Starting matlab engine')
+        logger.info('Starting matlab engine')
         self.eng = matlab.engine.start_matlab()
 
     def call(self, func_name:str, *args, **kwargs) -> any:
@@ -29,5 +34,5 @@ class MatlabBackend(GenericBackendInterface):
 
     def stop(self): 
         if self.is_running():
-            print('Stopping matlab engine')
+            logger.info('Stopping matlab engine')
             self.eng.exit()

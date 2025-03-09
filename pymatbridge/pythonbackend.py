@@ -1,14 +1,18 @@
 from .genericbackendinterface import GenericBackendInterface  # Explicitly expose the class
 
+import logging
 from types import ModuleType, FunctionType
 from typing import Literal, Optional
 
 import importlib
 import builtins
 
+logger = logging.getLogger("PythonBackend")
+logger.addHandler(logging.NullHandler())  # Prevents logging if the user doesn't configure it
+
+
 class PythonBackend(GenericBackendInterface):
     """ Executes functions in Python dynamically. """
-
 
     loaded_python_module: dict[str, ModuleType] 
 
@@ -44,23 +48,23 @@ class PythonBackend(GenericBackendInterface):
         alias = module_name if alias is None else alias
 
         if alias in self.loaded_python_module : 
-            print(f' Module {alias} is already loaded')
+            logger.info(f' Module {alias} is already loaded')
 
         # Import module dynamically
         try:
             module = importlib.import_module(module_name)  
         except ( ModuleNotFoundError):
-            print(f"Unable to load {module_name} as {alias}. Module not found")
+            logger.error(f"Unable to load {module_name} as {alias}. Module not found")
         
         self.loaded_python_module[alias] = module
         return self
 
     def link_python_function(self, alias:str, func:FunctionType) -> GenericBackendInterface:
         if not callable(func):
-            print(f'{alias} is not callable')
+            logger.error(f'{alias} is not callable')
 
         if alias in self.loaded_python_module : 
-            print(f' Function {alias} is already loaded')
+            logger.info(f' Function {alias} is already loaded')
         
         self.loaded_python_module[alias] = func
         return self
