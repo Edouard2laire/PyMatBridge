@@ -8,7 +8,7 @@ logger.addHandler(logging.NullHandler())  # Prevents logging if the user doesn't
 
 class PyMatBridge:
 
-    backend: list[GenericBackendInterface]
+    backend: list[GenericBackendInterface] | None
  
     def __init__(self ):
 
@@ -21,7 +21,27 @@ class PyMatBridge:
         
         self.backend.append(backend)
         return backend
-    
+
+    def get_backend(self, name:str) -> None | GenericBackendInterface: 
+        ''' Return the loaded backend name
+        
+        Example: 
+            - bridge.get_backend('python')
+            - bridge.get_backend('matlab')
+        '''
+
+        if self.backend is None or len(self.backend) == 0 :
+            logger.error(f"No backend available.")
+            return None
+        
+        for backend in self.backend:
+
+            if name == backend.name:
+                return backend
+            
+        logger.error(f"{name} not found ")
+        return None
+
     def call(self, func_name:str, *args, **kwargs) -> any:
         """ 
             Call the function  func_name using the defined backend 
