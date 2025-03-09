@@ -7,7 +7,7 @@ class GenericBackendInterface:
         pass
     
     def is_running(self) -> bool:
-        raise NotImplementedError()
+        return True
 
     def start(self): 
         raise NotImplementedError()
@@ -19,4 +19,4 @@ class GenericBackendInterface:
         pass    
         
     def stop(self): 
-        raise NotImplementedError()
+        pass

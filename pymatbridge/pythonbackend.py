@@ -20,12 +20,6 @@ class PythonBackend(GenericBackendInterface):
         self.name = 'python'
         self.loaded_python_module = {} 
 
-    def is_running(self) -> bool:
-        return True
-
-    def start(self): 
-        pass
-
     def call(self, func_name:str, *args, **kwargs) -> any:
         
         # Check in the loaded functions 
@@ -40,9 +34,6 @@ class PythonBackend(GenericBackendInterface):
         
         raise NameError(f"Function '{func_name}' not found")
     
-    def stop(self): 
-        pass
-
     def load_module(self, module_name:str, alias:str|None = None) -> GenericBackendInterface: 
         alias = module_name if alias is None else alias
 
