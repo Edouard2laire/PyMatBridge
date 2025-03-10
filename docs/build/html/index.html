@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PyMatBridge documentation &#8212; PyMatBridge 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pymatbridge-documentation">
+<h1>PyMatBridge documentation<a class="headerlink" href="#pymatbridge-documentation" title="Link to this heading">¶</a></h1>
+<p># PyMatBridge</p>
+<p>PyMatBridge is a Python package that provides a seamless interface for calling functions from either Python or MATLAB. It enables users to dynamically execute functions in Python when available and fall back to MATLAB when necessary.</p>
+<p>## Features</p>
+<ul class="simple">
+<li><p><strong>Hybrid Execution:</strong> Automatically calls a Python function if available; otherwise, it executes the MATLAB equivalent.</p></li>
+<li><p><strong>Modular Backend Design:</strong> Supports multiple language backends via an extensible architecture.</p></li>
+<li><p><strong>Dynamic Function Registration:</strong> Load Python modules and link custom functions.</p></li>
+<li><p><strong>Logging Support:</strong> Uses Python’s logging module for better debugging and output control.</p></li>
+</ul>
+<p>## Installation</p>
+<p>Ensure you have the required dependencies before using PyMatBridge.</p>
+<p>### Prerequisites</p>
+<ul class="simple">
+<li><p>Python 3.8+</p></li>
+<li><p>MATLAB installed with the MATLAB Engine API for Python</p></li>
+</ul>
+<p>### Installation Steps</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>sh
+# Clone the repository
+git clone <a class="reference external" href="https://github.com/yourusername/PyMatBridge.git">https://github.com/yourusername/PyMatBridge.git</a></p>
+<p># Navigate to the project directory
+cd PyMatBridge</p>
+<p># Install dependencies
+pip install -r requirements.txt
+<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<p>## Usage</p>
+<p>### Basic Example</p>
+<p><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a>python
+import logging
+from pymatbridge import PyMatBridge, PythonBackend</p>
+<dl class="simple">
+<dt>def sum_of_square(n: int):</dt><dd><p>return sum(x * x for x in range(1, n + 1))</p>
+</dd>
+</dl>
+<p># Configure logging
+logging.basicConfig(level=logging.INFO)</p>
+<p># Initialize PyMatBridge and add backends
+bridge = PyMatBridge()
+bridge.add_backend(PythonBackend()) </p>
+<blockquote>
+<div><p>.load_python_module(‘math’) .link_python_function(‘sum_of_square’, sum_of_square)</p>
+</div></blockquote>
+<p># Call functions dynamically
+print(“Sin(3.14) =”, bridge.call(“math.sin”, 3.14))
+print(“Sum of squares up to 20 =”, bridge.call(“sum_of_square”, 20))
+<a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">`</span></a></p>
+<p>### Calling MATLAB Functions</p>
+<p><a href="#id17"><span class="problematic" id="id18">``</span></a><a href="#id19"><span class="problematic" id="id20">`</span></a>python
+# Call a MATLAB function if it’s not available in Python
+print(“MATLAB sqrt(16) =”, bridge.call(“sqrt”, 16))</p>
+<p># Stop MATLAB engine when done
+bridge.stop_matlab()
+<a href="#id21"><span class="problematic" id="id22">``</span></a><a href="#id23"><span class="problematic" id="id24">`</span></a></p>
+<p>## Logging</p>
+<p>Users can configure logging to control output verbosity.</p>
+<p><a href="#id25"><span class="problematic" id="id26">``</span></a><a href="#id27"><span class="problematic" id="id28">`</span></a>python
+import logging</p>
+<dl>
+<dt>logging.basicConfig(</dt><dd><p>format=”%(asctime)s [%(levelname)s] %(message)s”,
+level=logging.DEBUG,
+handlers=[</p>
+<blockquote>
+<div><p>logging.FileHandler(“pymatbridge.log”),  # Save logs to file
+logging.StreamHandler()  # Print logs to console</p>
+</div></blockquote>
+<p>]</p>
+</dd>
+</dl>
+<section id="id29">
+<h2>)<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h2>
+<p>## Contributing</p>
+<p>We welcome contributions! To contribute:</p>
+<ol class="arabic simple">
+<li><p>Fork the repository.</p></li>
+<li><p>Create a new branch for your feature.</p></li>
+<li><p>Commit your changes and push to your fork.</p></li>
+<li><p>Submit a pull request.</p></li>
+</ol>
+<p>## License</p>
+<p>MIT License. See <cite>LICENSE</cite> for details.</p>
+<p>## Contact</p>
+<p>For any issues, please open an issue on GitHub or contact <cite>your.email&#64;example.com</cite>.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">PyMatBridge</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Edouard Delaire.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
